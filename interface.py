@@ -38,7 +38,7 @@ Remember: Be brief, accurate, and conversational. Only give detailed explanation
     # 2. Start the CLI loop
     while True:
         user_input = input("User: ")
-
+        
         # Check for exit command
         if user_input.lower() == "/exit":
             break
@@ -64,13 +64,14 @@ Remember: Be brief, accurate, and conversational. Only give detailed explanation
                 temperature=0.3,
                 top_k=20,
                 top_p=0.85,
-                return_full_text=False
+                return_full_text=False,
+                pad_token_id=pipe.tokenizer.eos_token_id
             )
 
             # Extract the generated text
             bot_text = response[0]['generated_text'].strip()
             
-            # Clean up any potential formatting issues and truncate if too long
+            # Clean up any potential formatting issues
             if bot_text.startswith("assistant\n"):
                 bot_text = bot_text[len("assistant\n"):].strip()
             if bot_text.startswith("Assistant:"):

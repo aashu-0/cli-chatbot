@@ -1,4 +1,3 @@
-# chat_memory.py
 
 class ChatMemory:
     """
@@ -19,6 +18,10 @@ class ChatMemory:
         """
         Adds a new user-bot exchange to the history.
         If the history exceeds the window size, the oldest exchange is removed.
+
+        Args:
+            user_input (str): The user's message
+            bot_response (str): The bot's response
         """
         self.history.append({"role": "user", "content": user_input})
         self.history.append({"role": "assistant", "content": bot_response})
@@ -31,5 +34,9 @@ class ChatMemory:
     def get_history(self):
         """
         Returns the stored conversation history.
+
+        Returns:
+            list: List of conversation messages in the format expected by HF pipelines
+
         """
         return self.history

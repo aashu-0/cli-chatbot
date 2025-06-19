@@ -18,8 +18,14 @@ def load_pipeline():
             torch_dtype=torch.float32,
             device_map="auto"
         )
+
+         # Ensure tokenizer has a pad token
+        if pipe.tokenizer.pad_token is None:
+            pipe.tokenizer.pad_token = pipe.tokenizer.eos_token
+
         print("Model pipeline loaded successfully.")
         return pipe
+        
     except Exception as e:
         print(f"Error loading model pipeline: {e}")
         print("Please ensure you have an internet connection for the first run,")
