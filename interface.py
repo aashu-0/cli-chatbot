@@ -14,8 +14,23 @@ def main():
     # window_size = 3  -> number of previous exchanges to remember
     memory = chat_memory.ChatMemory(window_size=3)
 
-    # system prompt
-    system_prompt = "You are a friendly and helpful conversational chatbot."
+    # system prompt with examples for concise responses
+    system_prompt = """You are a helpful chatbot that gives concise, direct answers. Keep responses short and to the point. Don't over-explain unless asked for details.
+
+Examples:
+User: What is the capital of France?
+Assistant: Paris.
+
+User: How are you?
+Assistant: I'm doing well, thanks! How can I help you today?
+
+User: Tell me about gravity
+Assistant: Gravity is the force that pulls objects toward each other. On Earth, it makes things fall down and keeps us on the ground.
+
+User: What's 2+2?
+Assistant: 4.
+
+Remember: Be brief, accurate, and conversational. Only give detailed explanations when specifically asked."""
 
     print("Chatbot initialized. Type '/exit' to quit.")
     print("-" * 50)
@@ -34,20 +49,32 @@ def main():
             {
                 "role": "system",
                 "content": system_prompt
-                },
-                *conversation_history,
+            },
+            *conversation_history,
             {"role": "user", "content": user_input},
         ]
 
         # 4. Generate a response using the pipeline
         try:
-            prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False)
-            response = pipe(prompt, max_new_tokens=256, do_sample=True, temperature=0.7, top_k=50, top_p=0.95)
+            prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            response = pipe(
+                prompt, 
+                max_new_tokens=256,
+                do_sample=True, 
+                temperature=0.3,
+                top_k=20,
+                top_p=0.85,
+                return_full_text=False
+            )
 
-            # Extract just the assistant's new reply
-            # The output is a list with the full conversation, so we get the last message
-            bot_response_full = response[0]['generated_text']
-            bot_text = bot_response_full[-1]['content'].strip()
+            # Extract the generated text
+            bot_text = response[0]['generated_text'].strip()
+            
+            # Clean up any potential formatting issues and truncate if too long
+            if bot_text.startswith("assistant\n"):
+                bot_text = bot_text[len("assistant\n"):].strip()
+            if bot_text.startswith("Assistant:"):
+                bot_text = bot_text[len("Assistant:"):].strip()
 
             print(f"Bot: {bot_text}")
 
@@ -57,7 +84,6 @@ def main():
         except Exception as e:
             print(f"\nAn error occurred during text generation: {e}")
             print("Please try again.")
-
 
     print("\nExiting chatbot. Goodbye!")
 

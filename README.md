@@ -1,10 +1,12 @@
 # Command-Line Chatbot with TinyLlama
 
-This project implements a command-line chatbot in Python using the `TinyLlama/TinyLlama-1.1B-Chat-v1.0` model, run locally via the Hugging Face `transformers` library. It maintains a short-term memory of the conversation using a sliding window mechanism to provide coherent, multi-turn replies.
+A command-line chatbot using the `TinyLlama/TinyLlama-1.1B-Chat-v1.0` model, run locally via the Hugging Face `transformers` library. It maintains a short-term memory of the conversation using a sliding window mechanism to provide coherent, multi-turn replies.
+
+no api keys, no internet after setup, just you and a 1.1b parameter model having a conversation in your terminal.
 
 ## Features
 
--   **Local Model:** Runs the lightweight `TinyLlama-1.1B-Chat` model locally on your CPU.
+-   **Local Model:** Runs the lightweight `TinyLlama-1.1B-Chat` model locally after initial setup.
 -   **Conversational Memory:** Remembers the last 3 exchanges to keep track of context.
 -   **Standard Libraries:** Uses the standard `transformers` and `torch` libraries.
 -   **Robust CLI:** A simple and continuous command-line interface 
@@ -15,16 +17,22 @@ This project implements a command-line chatbot in Python using the `TinyLlama/Ti
 
 -   Python 3.8+
 -   An internet connection (for the initial model download).
+-   About 3gb of free disk space (for the model)
 
 ## Setup Instructions
 
-1.  **Create a Virtual Environment:**
+1. **Clone this repository**
     ```bash
-    python -m venv venv
+    git clone https://github.com/aashu-0/cli-chatbot.git
+    cd cli-chatbot
+    ```
+2.  **Setup a Virtual Environment:**
+    ```bash
+    python -m venv .venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
 
-2.  **Install Dependencies:**
+3.  **Install Dependencies:**
     This project requires `transformers`, `torch` for CPU inference, and `accelerate` for efficient model loading.
 
     ```bash
@@ -32,15 +40,7 @@ This project implements a command-line chatbot in Python using the `TinyLlama/Ti
     ```
     *Note: `torch` is a large library. The installation might take some time.*
 
-## How to Run
-
-1.  **Navigate to the Directory:**
-    Make sure you are in the root directory of the project where `interface.py` is located.
-
-2.  **Run the Chatbot:**
-
-    Execute the main interface script. The first time you run it, it will download the TinyLlama model (approx. 2 GB), which may take some time depending on your internet connection.
-
+4.  **Run the Chatbot**
     ```bash
     python interface.py
     ```
@@ -49,15 +49,38 @@ This project implements a command-line chatbot in Python using the `TinyLlama/Ti
     Once you see the message `Chatbot initialized.` `Type '/exit' to quit.`, you can start typing your messages.
 
 ## Sample Interaction
-```bash
-User: Hi there!
-Bot: Hello! How can I help you today?
-User: What is the capital of France?
-Bot: The capital of France is Paris.
-User: And what about Italy?
-Bot: The capital of Italy is Rome.
-User: Can you tell me something about the Eiffel Tower?
-Bot: The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France. It is named after the engineer Gustave Eiffel, whose company designed and built the tower.
+```text
+User: what is the capital of India
+Bot: The capital of India is New Delhi, also known as "Delhi."
+User: what about China
+Bot: China's capital city is Beijing, also known as "Beijing."
+User: Name of current ruling party there
+Bot: The current ruling party in China is the Chinese Communist Party (CCP).
+User: what about India
+Bot: India's current ruling party is the Bharatiya Janata Party(BJP), which is currently in power.
 User: /exit
+
 Exiting chatbot. Goodbye!
 ```
+## File Structure
+```bash
+├── interface.py          # main cli loop
+├── model_loader.py       # handles model loading
+├── chat_memory.py        # manages conversation history
+├── README.md            # this file
+└── .gitignore           # ignores venv and cache files
+```
+## Customization
+want to tweak the behavior? check these settings in interface.py:
+
+- window_size=3: change how many exchanges to remember
+- max_new_tokens=256: adjust response length
+- temperature=0.3: make responses more creative (higher) or focused (lower)
+
+## Limitations
+- responses can be inconsistent (it's a 1.1b model, not gpt-4)
+- cpu-only inference means slower responses
+- model knowledge cutoff depends on training data
+
+## Why TinyLlama?
+it's small enough to run on most machines, fast enough to be usable, and smart enough to have decent conversations. perfect for learning, experimenting, or when you want a private chatbot that doesn't send your conversations to the cloud.
